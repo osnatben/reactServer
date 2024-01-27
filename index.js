@@ -15,22 +15,30 @@ app.get("/", (req, res) => {
 }
 );
 
+let users = [{name: "osnat", password:"1234"},{name: "dvori", password:"5678"}]
 
 //add get request that check if the request body has name = "admin" and password = 123456
 //path: localhost:8787/login
 app.post("/login", (req, res) => {
     const body = req.body;
-    if (body.name === "admin" && body.password === "123456") {
+  
+    if (body.name == "admin" && body.password == "123456") {
         res.statusCode = 200;
-        res.send("Login success!");
-    } else {
-        res.statusCode = 401;
-        res.send("Login failed!");
+        res.send('1');
+    } else if (users.find(u => u.name == body.name && u.password == body.password)) {
+        res.statusCode = 200;
+        res.send('2')
+        
+    }
+    else {
+        res.statusCode = 200;
+        res.send('0');
+        
     }
 });
 
 // add post request that add new appointment to the appointments array and check in the array if the time is available or not
-const appointments = [];
+const appointments = [];//פגישות -אירועים
 
 app.post("/appointment", (req, res) => {
     const body = req.body;
@@ -57,7 +65,7 @@ app.get("/appointments", (req, res) => {
     res.send(appointments);
 });
 
-let services = [];
+let services = []; //שרותים -נותני תקציב
 
 app.post("/service", (req, res) => {
     const serviceExists = services.find((service) => service.name === req.body.name);
@@ -76,7 +84,7 @@ app.get("/services", (req, res) => {
     res.send(services);
 });
 
-let businessData ={};
+let businessData = {};
 
 app.post("/businessData", (req, res) => {
     const body = req.body;
