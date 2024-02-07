@@ -15,25 +15,25 @@ app.get("/", (req, res) => {
 }
 );
 
-let users = [{name: "osnat", password:"1234"},{name: "dvori", password:"5678"}]
+let users = [{ name: "osnat", password: "1234" }, { name: "dvori", password: "5678" }]
 
 //add get request that check if the request body has name = "admin" and password = 123456
 //path: localhost:8787/login
 app.post("/login", (req, res) => {
     const body = req.body;
-  
+
     if (body.name == "admin" && body.password == "123456") {
         res.statusCode = 200;
         res.send('1');
     } else if (users.find(u => u.name == body.name && u.password == body.password)) {
         res.statusCode = 200;
         res.send('2')
-        
+
     }
     else {
         res.statusCode = 200;
         res.send('0');
-        
+
     }
 });
 
@@ -42,20 +42,57 @@ const appointments = [];//פגישות -אירועים
 
 app.post("/appointment", (req, res) => {
     const body = req.body;
+    console.log("Request Body:", body);
     let isAvailable = true;
-    // from foreach loop to for of loop
+
+    console.log("Existing Appointments:", appointments);
+
     for (const appointment of appointments) {
         if (appointment.dateTime === body.dateTime) {
             isAvailable = false;
         }
+
     }
 
     if (isAvailable) {
+        body.status = 0;
+        if (appointments.length) {
+            body.id = appointments[appointments.length - 1].id+1
+        }
+        else {
+            body.id = 1000;
+        }
         appointments.push(body);
         res.statusCode = 200;
-        res.send("Appointment added successfully!");
+        res.send(body);
+        console.log("Appointments after addition:", appointments);
+
     } else {
         res.statusCode = 400;
+        console.log("!!!!!!!!!!!!!!!!!!!!!");
+
+        res.send("Appointment is not available!");
+    }
+});
+
+app.put("/appointment", (req, res) => {
+    const body = req.body;
+    console.log("Request Body:", body);
+    const findIndex = appointments.findIndex(x => x.id == body.id)
+
+
+    if (findIndex > -1) {
+
+        appointments[findIndex].status = body.status;
+
+        res.statusCode = 200;
+        res.send("Appointment update successfully!");
+        console.log("Appointments after addition:", appointments);
+
+    } else {
+        res.statusCode = 400;
+        console.log("!!!!!!!!!!!!!!!!!!!!!");
+
         res.send("Appointment is not available!");
     }
 });
@@ -80,8 +117,11 @@ app.post("/service", (req, res) => {
     res.send("Service added successfully!");
 });
 
+
 app.get("/services", (req, res) => {
+    console.log(services)
     res.send(services);
+
 });
 
 let businessData = {};
@@ -100,6 +140,9 @@ app.put("/businessData", (req, res) => {
     res.statusCode = 200;
     res.send(businessData);
 });
+
+
+
 
 app.get("/businessData", (req, res) => {
     res.send(businessData);
